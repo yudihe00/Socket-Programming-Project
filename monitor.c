@@ -1,5 +1,5 @@
 /*
-** monitor.c 
+** client.c 
 ** Yudi He
 ** ID: 5670857217
 */
@@ -16,7 +16,7 @@
 
 #include <arpa/inet.h>
 
-#define PORT "26217" // the TCP port of aws that monitor connect to
+#define PORT "26217" // the TCP port of aws that client connect to
 
 #define MAXDATASIZE 100 // max number of bytes we can get at once 
 #define IPADDRESS "127.0.0.1"
@@ -31,13 +31,18 @@ void *get_in_addr(struct sockaddr *sa)
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
 	int sockfd, numbytes;  
 	char buf[MAXDATASIZE];
 	struct addrinfo hints, *servinfo, *p;
 	int rv;
 	char s[INET6_ADDRSTRLEN];
+
+	if (argc != 3) {
+	    fprintf(stderr,"usage: client function input\n");
+	    exit(1);
+	}
 
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
@@ -52,12 +57,12 @@ int main(void)
 	for(p = servinfo; p != NULL; p = p->ai_next) {
 		if ((sockfd = socket(p->ai_family, p->ai_socktype,
 				p->ai_protocol)) == -1) {
-			perror("monitor: socket");
+			perror("client: socket");
 			continue;
 		}
 
 		if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-			perror("monitor: connect");
+			perror("client: connect");
 			close(sockfd);
 			continue;
 		}
@@ -66,35 +71,42 @@ int main(void)
 	}
 
 	if (p == NULL) {
-		fprintf(stderr, "monitor: failed to connect\n");
+		fprintf(stderr, "client: failed to connect\n");
 		return 2;
 	}
 
 	inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
 			s, sizeof s);
-	printf("The monitor is up and running.\n");
+	printf("The client is up and running.”\n");
 
 	freeaddrinfo(servinfo); // all done with this structure
-
-
-	// connect 2 strings
-	char temp[64]="Hello from monitor\n";
-
-	if ((numbytes = send(sockfd, temp, strlen(temp), 0)) == -1) {
+	
+	if ((numbytes = send(sockfd, argv[1], strlen(argv[1]), 0)) == -1) {
 		perror("send");
 		exit(1);
 	}
-	printf("The monitor sent <%s> to AWS.\n",temp);
+	if ((numbytes = send(sockfd, argv[2], strlen(argv[2]), 0)) == -1) {
+		perror("send");
+		exit(1);
+	}
+	printf("The client sent <%s> and <%s> to AWS.\n",argv[2],argv[1]);
 	//printf("talker: sent %d bytes to %s\n", numbytes, IPADDRESS);
-
-	if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
+	while (1){
+		if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
 	    perror("recv");
 	    exit(1);
+		}
+
+		buf[numbytes] = '\0';
+		while(numbytes!=0)
+		{
+			printf("numbytes=%d, debug: monitor: received '%s'\n",numbytes,buf);
+			numbytes=0;
+		}
+		
+		//exit(0);
 	}
-
-	buf[numbytes] = '\0';
-
-	printf("monitor: received '%s'\n",buf);
+	
 
 	close(sockfd);
 
