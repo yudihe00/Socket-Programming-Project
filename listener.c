@@ -39,6 +39,8 @@ int main(void)
 	int numbytes;
 	struct sockaddr_storage their_addr;
 	char buf[MAXBUFLEN];
+	char function[MAXBUFLEN];
+	char word[MAXBUFLEN];
 	socklen_t addr_len;
 	char s[INET6_ADDRSTRLEN];
 	char send_data[1024];
@@ -82,27 +84,28 @@ int main(void)
 
 	while(1) {
 		
-		// if ((numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,
-		// 	(struct sockaddr *)&their_addr, &addr_len)) == -1) {
-		// 	perror("recvfrom");
-		// 	exit(1);
-		// }
-		numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,
+		numbytes = recvfrom(sockfd, function, MAXBUFLEN-1 , 0,
 			(struct sockaddr *)&their_addr, &addr_len);
 
-		buf[numbytes] = '\0';
+		function[numbytes] = '\0';
+
+		numbytes = recvfrom(sockfd, word, MAXBUFLEN-1 , 0,
+			(struct sockaddr *)&their_addr, &addr_len);
+
+		word[numbytes] = '\0';
+
 		printf("\nlistener: got packet from %s\n",
 			inet_ntop(their_addr.ss_family,
 				get_in_addr((struct sockaddr *)&their_addr),
 				s, sizeof s));
-		printf("listener: packet is %d bytes long\n", numbytes);
-		printf("listener: packet contains \"%s\"\n", buf);
+		//printf("listener: packet is %d bytes long\n", numbytes);
+		printf("listener: function is <%s>, word is <%s>\n ", function,word);
 		strcpy(send_data,"search results");
     	printf(" SEND : %s",send_data);
 
     	numbytes = sendto(sockfd,send_data,strlen(send_data),0,
     		(struct sockaddr *)&their_addr, addr_len);
-    	printf("\nsend %d bytes back\n", numbytes);
+    	
     	if (numbytes==-1) {
     		perror("recv");
 	    	exit(1);
@@ -111,8 +114,6 @@ int main(void)
 
 		//close(sockfd);
 	}
-
-	
 
 	return 0;
 }

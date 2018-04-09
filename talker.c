@@ -20,27 +20,18 @@ get feedback from listener
 							// Backend-Server (A)
 #define IPADDRESS "127.0.0.1" // local IP address
 
-int main(int argc, char *argv[])
+int setupUDP(char *function, char *word, char* port)
 {
 	int sockfd;
-	struct addrinfo hints, *servinfo, *p;
 	int rv;
 	int numbytes;
-	char recv_data[1024];
-	struct sockaddr_storage their_addr;
-	
+	struct addrinfo hints, *servinfo, *p;
 	socklen_t addr_len;
-
-	if (argc != 3) {
-		fprintf(stderr,"usage: talker function word\n");
-		exit(1);
-	}
-
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_DGRAM;
 
-	if ((rv = getaddrinfo(IPADDRESS, SERVERPORT, &hints, &servinfo)) != 0) {
+	if ((rv = getaddrinfo(IPADDRESS, port, &hints, &servinfo)) != 0) {
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
 		return 1;
 	}
@@ -52,7 +43,6 @@ int main(int argc, char *argv[])
 			perror("talker: socket");
 			continue;
 		}
-
 		break;
 	}
 
@@ -60,25 +50,46 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "talker: failed to create socket\n");
 		return 2;
 	}
-	// connect 2 strings
-	char temp[64]="";
-	strcat(temp, argv[1]);
-	strcat(temp, argv[2]);
-	if ((numbytes = sendto(sockfd, temp, strlen(temp), 0,
+	// send function to server
+	if ((numbytes = sendto(sockfd, function, strlen(function), 0,
 			 p->ai_addr, p->ai_addrlen)) == -1) {
 		perror("talker: sendto");
 		exit(1);
 	}
 
-	printf("talker: sent %d bytes to %s\n", numbytes, IPADDRESS);
+	// send word to server
+	if ((numbytes = sendto(sockfd, word, strlen(word), 0,
+			 p->ai_addr, p->ai_addrlen)) == -1) {
+		perror("talker: sendto");
+		exit(1);
+	}
 
-	freeaddrinfo(servinfo);
+	printf("talker: sent <%s> and <%s> to %s\n", function, word, IPADDRESS);
+
+	freeaddrinfo(servinfo); // done with servinfo
+	return sockfd;
+}
+
+
+int main(int argc, char *argv[])
+{
+	int sockfd;	
+	int numbytes;
+	char recv_data[1024];
+	struct sockaddr_storage their_addr;
+
+	if (argc != 3) {
+		fprintf(stderr,"usage: talker function word\n");
+		exit(1);
+	}
+	sockfd=setupUDP(argv[1],argv[2],SERVERPORT);
+	
 	int bytes_recv = recvfrom(sockfd,recv_data,sizeof recv_data,0, NULL, NULL);
 	if ( bytes_recv == -1) {
 	    perror("recv");
 	    exit(1);
 	}
-	printf("%d\n",bytes_recv );
+	
    	recv_data[bytes_recv]= '\0';
    	printf("Received :%s\n",recv_data);
 
