@@ -48,9 +48,17 @@ void *get_in_addr(struct sockaddr *sa)
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
-void get_request_from_client()
+void clear_dead_process()
 {
-
+	struct sigaction sa; //sigaction() code is responsible for reaping zombie processes 
+						//that appear as the fork()ed child processes exit.
+	sa.sa_handler = sigchld_handler; // reap all dead processes
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART;
+	if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+		perror("sigaction");
+		exit(1);
+	}
 }
 
 
@@ -59,19 +67,18 @@ int main(void)
 	int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
 	struct addrinfo hints, *servinfo, *p;
 	struct sockaddr_storage their_addr; // connector's address information
-	socklen_t sin_size;
-	struct sigaction sa;
+	socklen_t sin_size; // used for accept()
 	int yes=1;
 	char s[INET6_ADDRSTRLEN];
-	char buf[100];
-	char function[10];
-	char word[100];
-	int numbytes;
-	int rv;
+	char buf[100]; // temp saving place for receiving
+	char function[6]; //function sent by client
+	char word[100]; //word sent by client
+	int numbytes; //using in receive or send
+	int rv; // use for error checking of getaddrinfo()
 
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
+	memset(&hints, 0, sizeof hints); //Zero the whole structure before use
+	hints.ai_family = AF_UNSPEC; // use AF_INET6 to force IPv6
+	hints.ai_socktype = SOCK_STREAM; //TCP SOCK_STREAM sockets
 	hints.ai_flags = AI_PASSIVE; // use my IP
 
 	if ((rv = getaddrinfo(NULL, PORTCLIENT, &hints, &servinfo)) != 0) {
@@ -107,13 +114,8 @@ int main(void)
 		perror("listen");
 		exit(1);
 	}
-	sa.sa_handler = sigchld_handler; // reap all dead processes
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART;
-	if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-		perror("sigaction");
-		exit(1);
-	}
+
+	clear_dead_process();
 	printf("The AWS is up and running.\n");
 
 	while(1) 
@@ -133,22 +135,21 @@ int main(void)
 		if (!fork()) { // this is the child process
 			close(sockfd); // child doesn't need the listener
 			
-			if ((numbytes = recv(new_fd, buf, sizeof buf, 0)) == -1) {
+			// receive function and word from client
+			if ((numbytes = recv(new_fd, function, sizeof function, 0)) == -1) {
 				perror("recv");
 				exit(1);
 			}
-			buf[numbytes] = '\0';
-
-			//printf("aws: received '%s'\n",buf);
-			int i;
-			for (i=0;i<6;i++) {
-				function[i]=buf[i];
+			function[numbytes] = '\0';
+			printf("debug: function is %s\n", function);
+			//strcpy(function,buf);
+			if ((numbytes = recv(new_fd, word, sizeof word, 0)) == -1) {
+				perror("recv");
+				exit(1);
 			}
-			function[i]='\0';
-			for(i=6;buf[i]!='\0';i++){
-				word[i-6]=buf[i];
-			}
-			word[i]='\0';
+			word[numbytes] = '\0';
+			printf("debug: word is %s\n", word );
+			
 			printf("The AWS received input=<%s> and function=<%s> from the client using TCP over port 25217\n",word,function);
 
 			if (send(new_fd, "Hello, world!", 13, 0) == -1)

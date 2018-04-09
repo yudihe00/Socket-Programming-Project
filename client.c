@@ -77,16 +77,15 @@ int main(int argc, char *argv[])
 
 	inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
 			s, sizeof s);
-	printf("The client is up and running.\n");
+	printf("The client is up and running.”\n");
 
 	freeaddrinfo(servinfo); // all done with this structure
-
-
-	// connect 2 strings
-	char temp[64]="";
-	strcat(temp, argv[1]);
-	strcat(temp, argv[2]);
-	if ((numbytes = send(sockfd, temp, strlen(temp), 0)) == -1) {
+	
+	if ((numbytes = send(sockfd, argv[1], strlen(argv[1]), 0)) == -1) {
+		perror("send");
+		exit(1);
+	}
+	if ((numbytes = send(sockfd, argv[2], strlen(argv[2]), 0)) == -1) {
 		perror("send");
 		exit(1);
 	}
@@ -100,7 +99,7 @@ int main(int argc, char *argv[])
 
 	buf[numbytes] = '\0';
 
-	printf("client: received '%s'\n",buf);
+	printf("debug: client: received '%s'\n",buf);
 
 	close(sockfd);
 
