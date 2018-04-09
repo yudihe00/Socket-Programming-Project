@@ -20,6 +20,10 @@ get feedback from listener
 							// Backend-Server (A)
 #define IPADDRESS "127.0.0.1" // local IP address
 
+/////////////////////////////////////////////////////////////////
+// setupUDP and send function,word to specific port
+// only used in udpQuery function
+////////////////////////////////////////////////////////////////
 int setupUDP(char *function, char *word, char* port)
 {
 	int sockfd;
@@ -70,30 +74,39 @@ int setupUDP(char *function, char *word, char* port)
 	return sockfd;
 }
 
-
-int main(int argc, char *argv[])
+/////////////////////////////////////////////////////////////////
+// udpQuery, based on function, word and port
+////////////////////////////////////////////////////////////////
+char* udpQuery(char *function, char *word, char* port)
 {
-	int sockfd;	
-	int numbytes;
-	char recv_data[1024];
-	struct sockaddr_storage their_addr;
-
-	if (argc != 3) {
-		fprintf(stderr,"usage: talker function word\n");
-		exit(1);
-	}
-	sockfd=setupUDP(argv[1],argv[2],SERVERPORT);
+	int sockfd;
+	char * recv_data=(char *) malloc(1024);
+	sockfd=setupUDP(function,word,port);
 	
 	int bytes_recv = recvfrom(sockfd,recv_data,sizeof recv_data,0, NULL, NULL);
 	if ( bytes_recv == -1) {
 	    perror("recv");
 	    exit(1);
 	}
-	
    	recv_data[bytes_recv]= '\0';
-   	printf("Received :%s\n",recv_data);
-
 	close(sockfd);
+	return recv_data;
+}
+
+int main(int argc, char *argv[])
+{
+	int sockfd;	
+	int numbytes;
+	//char recv_data[1024];
+	// char * recv_data=(char *) malloc(1024);
+	struct sockaddr_storage their_addr;
+
+	if (argc != 3) {
+		fprintf(stderr,"usage: talker function word\n");
+		exit(1);
+	}
+	char *recv_data=udpQuery(argv[1],argv[2],SERVERPORT);
+	printf("Received :%s\n",recv_data);
 
 	return 0;
 }
