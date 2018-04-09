@@ -125,8 +125,8 @@ int main(void)
 
 	sockfd = setupTCP(PORTCLIENT);
 	sockfd_monitor = setupTCP(PORTMONITOR);
-	printf("debug: sockfd is %d\n", sockfd);
-	printf("debug: sockfd_monitor is %d\n", sockfd_monitor);
+	//printf("debug: sockfd is %d\n", sockfd);
+	//printf("debug: sockfd_monitor is %d\n", sockfd_monitor);
 	printf("The AWS is up and running.\n");
 
 	int monitorOn=0;
@@ -137,48 +137,21 @@ int main(void)
 			perror("accept");
 			continue;
 		}
-		printf("debug:monitorOn=%d\n",monitorOn);
-
+		//printf("debug:monitorOn=%d\n",monitorOn);
 		inet_ntop(their_addr.ss_family,
 			get_in_addr((struct sockaddr *)&their_addr),
 			s, sizeof s);
 		//printf("server: got connection from %s\n", s);
-
 		if (!fork()) { // this is the child process
 			close(sockfd_monitor); // child doesn't need the listener
-			
-			// receive function and word from client
-			if ((numbytes = recv(new_fd_monitor, function, sizeof function, 0)) == -1) {
-				perror("recv");
-				exit(1);
-			}
-			function[numbytes] = '\0';
-			printf("debug: function is %s\n", function);
-			//strcpy(function,buf);
-			if ((numbytes = recv(new_fd_monitor, word, sizeof word, 0)) == -1) {
-				perror("recv");
-				exit(1);
-			}
-			word[numbytes] = '\0';
-			printf("debug: word is %s\n", word );
-			
-			printf("The AWS received input=<%s> and function=<%s> from the client using TCP over port 26217\n",word,function);
-			char test[20]="Hello,word!";
-			if (send(new_fd_monitor, test, sizeof test, 0) == -1)
-				perror("send");
-			char test2[20]="Hello,word2!";
-			if (send(new_fd_monitor, test2, sizeof test2, 0) == -1)
-				perror("send");
-			close(new_fd_monitor);
 			monitorOn=1;
-			printf("debug:monitorOn=%d\n",monitorOn);
-			break;
-			exit(0);
-			
+			//printf("debug:monitorOn=%d\n",monitorOn);
+			continue;		
 		}
 		close(new_fd_monitor);  // parent doesn't need this
 	}
-	printf("debug:out monitorOn=%d\n",monitorOn);
+	//printf("debug:out monitorOn=%d\n",monitorOn);
+
 	while(1) 
 	{  	// main accept() loop
 		sin_size = sizeof their_addr;
@@ -215,6 +188,12 @@ int main(void)
 
 			if (send(new_fd, "Hello, world!", 13, 0) == -1)
 				perror("send");
+
+			// send to monitor
+			char test3[20]="aws send to monitor";
+			if (send(new_fd_monitor, test3, sizeof test3, 0) == -1)
+				perror("send");
+			
 			close(new_fd);
 			exit(0);
 		}
