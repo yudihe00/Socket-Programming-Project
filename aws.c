@@ -174,17 +174,21 @@ int setupUDP(char *function, char *word, char* port)
 char* udpQuery(char *function, char *word, char* port)
 {
 	int sockfd;
-	char * recv_data=(char *) malloc(1024);
+	char * return_recv_data=(char *) malloc(100); // return to main
+	char recv_data[1024]; // save the udp return result
 	sockfd=setupUDP(function,word,port);
+	int bytes_recv;
 	
-	int bytes_recv = recvfrom(sockfd,recv_data,sizeof recv_data,0, NULL, NULL);
+	bytes_recv = recvfrom(sockfd,recv_data,sizeof recv_data,0, NULL, NULL);
 	if ( bytes_recv == -1) {
 	    perror("recv");
 	    exit(1);
 	}
-   	recv_data[bytes_recv]= '\0';
+   	//recv_data[bytes_recv]= '\0';
+   	printf("debug in udpQuery: Received :%s, bytes_recv is %d\n",recv_data,bytes_recv);
 	close(sockfd);
-	return recv_data;
+	strcpy(return_recv_data,recv_data);
+	return return_recv_data;
 }
 
 
@@ -262,6 +266,10 @@ int main(void)
 			printf("debug: word is %s\n", word );
 			
 			printf("The AWS received input=<%s> and function=<%s> from the client using TCP over port 25217\n",word,function);
+
+			//test for udp
+			char *recv_data=udpQuery(function,word,SERVERPORTA);
+			printf("debug: Received from listener: %s\n",recv_data);
 
 			if (send(new_fd, "Hello, world!", 13, 0) == -1)
 				perror("send");

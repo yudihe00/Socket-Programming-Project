@@ -1,5 +1,5 @@
 all: 
-	# gcc -o aws aws.c
+	gcc -o aws aws.c
 	gcc -o client client.c
 	gcc -o listener listener.c
 	gcc -o talker talker.c
