@@ -208,9 +208,9 @@ void suffix(char word[],FILE* file)
 
 int main()
 {
-    // char const* const fileName = argv[1]; /* should check that argc > 1 */
+    
     char *fileName="backendA.txt";
-    FILE* file = fopen(fileName, "r"); /* should check the result */
+    FILE* file = fopen(fileName, "r"); 
     char function[10]="suffix";
     char word[20]="ble";
 
