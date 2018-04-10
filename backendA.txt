@@ -1999,5 +1999,5 @@ Neaped :: "Left aground on the height of a spring tide  so that it will not floa
 Ketonic :: "Pertaining to  or derived from  a ketone; as  a ketonic acid."
 Jumble :: To meet or unite in a confused way; to mix confusedly.
 Bumble :: Just test hyd
-tumble :: test
-bumcle :: test2
+Tumble :: test
+Bumcle :: test2
