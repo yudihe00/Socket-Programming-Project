@@ -91,10 +91,6 @@ int main(void)
 
 		word[numbytes] = '\0';
 
-		//printf("\nlistener: got packet from %s\n",
-			// inet_ntop(their_addr.ss_family,
-			// 	get_in_addr((struct sockaddr *)&their_addr),
-			// 	s, sizeof s));
 		//printf("listener: packet is %d bytes long\n", numbytes);
 		printf("The ServerA received input <%s> and operation <%s>\n", function,word);
 		strcpy(send_data,"test: search results from serverA");

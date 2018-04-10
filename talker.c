@@ -91,7 +91,7 @@ char* udpQuery(char *function, char *word, char* port)
 	    exit(1);
 	}
    	//recv_data[bytes_recv]= '\0';
-   	printf("debug in udpQuery: Received :%s, bytes_recv is %d\n",recv_data,bytes_recv);
+   	//printf("debug in udpQuery: Received :%s, bytes_recv is %d\n",recv_data,bytes_recv);
 	close(sockfd);
 	strcpy(return_recv_data,recv_data);
 	return return_recv_data;
