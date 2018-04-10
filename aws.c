@@ -169,7 +169,7 @@ int setupUDP(char *function, char *word, char* port)
 }
 
 /////////////////////////////////////////////////////////////////
-// udpQuery, based on function, word and port
+// udpQuery, according to function, word and port
 ////////////////////////////////////////////////////////////////
 char* udpQuery(char *function, char *word, char* port)
 {

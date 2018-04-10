@@ -1,9 +1,9 @@
 all: 
 	gcc -o aws aws.c
 	gcc -o client client.c
-	gcc -o listener listener.c
+	# gcc -o listener listener.c
 	gcc -o talker talker.c
-	gcc -o serverA serverA.c
+	gcc -o servera servera.c
 	gcc -o monitor monitor.c
 
 .PHONY: aws

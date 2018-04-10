@@ -1,9 +1,6 @@
 /*
-** ServerA.c 
-Backend-Server (A)--a UDP server
-listen continuously
-send feedback to talker.c
-
+** server.c 
+based on datagram sockets "server" demo, listener.c in beej
 */
 
 #include <stdio.h>
@@ -39,6 +36,7 @@ int main(void)
 	int numbytes;
 	struct sockaddr_storage their_addr;
 	char buf[MAXBUFLEN];
+	char function[MAXBUFLEN];
 	char word[MAXBUFLEN];
 	socklen_t addr_len;
 	char s[INET6_ADDRSTRLEN];
@@ -61,11 +59,13 @@ int main(void)
 			perror("listener: socket");
 			continue;
 		}
+
 		if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
 			close(sockfd);
 			perror("listener: bind");
 			continue;
 		}
+
 		break;
 	}
 
@@ -77,40 +77,32 @@ int main(void)
 	freeaddrinfo(servinfo);
 	addr_len = sizeof their_addr;
 
-	printf("The Server A is up and running using UDP on port 21217\n");
+	printf("listener: waiting to recvfrom...\n");
 
 	while(1) {
 		
-		numbytes = recvfrom(sockfd, buf, MAXBUFLEN-1 , 0,
+		numbytes = recvfrom(sockfd, function, MAXBUFLEN-1 , 0,
 			(struct sockaddr *)&their_addr, &addr_len);
 
-		buf[numbytes] = '\0';
-		
-		//search operation
-		int i;
-		if(buf[0]=='s'){
-			for (i = 6; buf[i]!='\0';i++) {
-				word[i-6]=buf[i];
-			}
-			word[i]='\0';
-			printf("The ServerA received input %s and operation search”\n", word);
-		}
-		// prefix operation
-		else {
-			
-			for (i = 6; buf[i]!='\0';i++) {
-				word[i-6]=buf[i];
-			}
-			word[i]='\0';
-			printf("The ServerA received input %s and operation prefix”\n", word);
-		}
+		function[numbytes] = '\0';
 
-		strcpy(send_data,"search results");
-    	printf(" SEND : %s",send_data);
+		numbytes = recvfrom(sockfd, word, MAXBUFLEN-1 , 0,
+			(struct sockaddr *)&their_addr, &addr_len);
+
+		word[numbytes] = '\0';
+
+		printf("\nlistener: got packet from %s\n",
+			inet_ntop(their_addr.ss_family,
+				get_in_addr((struct sockaddr *)&their_addr),
+				s, sizeof s));
+		//printf("listener: packet is %d bytes long\n", numbytes);
+		printf("listener: function is <%s>, word is <%s>\n ", function,word);
+		strcpy(send_data,"test: search results");
+    	printf(" SEND : %s\n",send_data);
 
     	numbytes = sendto(sockfd,send_data,strlen(send_data),0,
     		(struct sockaddr *)&their_addr, addr_len);
-    	printf("\nsend %d bytes back\n", numbytes);
+    	printf("debug: numbytes is %d\n", numbytes);
     	if (numbytes==-1) {
     		perror("recv");
 	    	exit(1);
@@ -119,5 +111,6 @@ int main(void)
 
 		//close(sockfd);
 	}
+
 	return 0;
 }

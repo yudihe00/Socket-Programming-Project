@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
 	buf[numbytes] = '\0';
 
-	printf("debug: client: received '%s'\n",buf);
+	printf("debug: client: received '%s' from aws\n",buf);
 
 	close(sockfd);
 
