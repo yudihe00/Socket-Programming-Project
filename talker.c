@@ -18,6 +18,10 @@ get feedback from listener
 
 #define SERVERPORT "21217"	// the port users will be connecting to 
 							// Backend-Server (A)
+#define SERVERPORTB "22217"	// the port users will be connecting to 
+							// Backend-Server (B)
+#define SERVERPORTC "23217"	// the port users will be connecting to 
+							// Backend-Server (C)
 #define IPADDRESS "127.0.0.1" // local IP address
 
 /////////////////////////////////////////////////////////////////
@@ -106,7 +110,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr,"usage: talker function word\n");
 		exit(1);
 	}
-	char *recv_data=udpQuery(argv[1],argv[2],SERVERPORT);
+	char *recv_data=udpQuery(argv[1],argv[2],SERVERPORTC);
 	printf("Received :%s\n",recv_data);
 
 	return 0;

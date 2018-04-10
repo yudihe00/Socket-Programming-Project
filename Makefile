@@ -4,6 +4,8 @@ all:
 	# gcc -o listener listener.c
 	gcc -o talker talker.c
 	gcc -o servera servera.c
+	gcc -o serverb serverb.c
+	gcc -o serverc serverc.c
 	gcc -o monitor monitor.c
 	gcc -o searcha searcha.c
 
