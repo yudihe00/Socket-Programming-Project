@@ -28,6 +28,7 @@ TCP with monitor 26217
 
 #define BACKLOG 10	 // how many pending connections queue will hold
 
+// used in clear_dead_process()
 void sigchld_handler(int s)
 {
 	(void)s; // quiet unused variable warning
@@ -185,13 +186,20 @@ char* udpQuery(char *function, char *word, char* port)
 	    exit(1);
 	}
    	//recv_data[bytes_recv]= '\0';
-   	printf("debug in udpQuery: Received :%s, bytes_recv is %d\n",recv_data,bytes_recv);
+   	//printf("debug in udpQuery: Received :%s, bytes_recv is %d\n",recv_data,bytes_recv);
 	close(sockfd);
 	strcpy(return_recv_data,recv_data);
 	return return_recv_data;
 }
 
-
+// send text[] to monitor
+void send_to_monitor(char text[], int new_fd_monitor)
+{	
+	char text2[1000];
+	strcpy (text2,text);
+	if (send(new_fd_monitor, text, strlen(text2), 0) == -1)
+				perror("send");
+}
 int main(void)
 {
 	int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
@@ -269,23 +277,21 @@ int main(void)
 
 			//test for udp
 			char *recv_data=udpQuery(function,word,SERVERPORTA);
-			printf("debug: Received from listener: %s\n",recv_data);
+			printf("debug: Received from serverA: %s\n",recv_data);
 
-			if (send(new_fd, "Hello, world!", 13, 0) == -1)
+			// send search result back to client
+			if (send(new_fd, recv_data, strlen(recv_data), 0) == -1)
 				perror("send");
 
 			// send to monitor
-			char test3[20]="aws send to monitor";
-			if (send(new_fd_monitor, test3, sizeof test3, 0) == -1)
-				perror("send");
+			char test3[1000]="aws send to monitor !";
+			send_to_monitor(test3,new_fd_monitor);
 
 			close(new_fd);
 			exit(0);
 		}
 		close(new_fd);  // parent doesn't need this
 
-		
-		
 	} // end of while(1)
 	return 0;
 }

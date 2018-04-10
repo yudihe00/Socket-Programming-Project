@@ -18,7 +18,7 @@
 
 #define PORT "26217" // the TCP port of aws that monitor connect to
 
-#define MAXDATASIZE 100 // max number of bytes we can get at once 
+#define MAXDATASIZE 1024 // max number of bytes we can get at once 
 #define IPADDRESS "127.0.0.1"
 
 // get sockaddr, IPv4 or IPv6:
@@ -72,7 +72,7 @@ int main(void)
 
 	inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
 			s, sizeof s);
-	printf("The monitor is up and running.”\n");
+	printf("The monitor is up and running.\n");
 
 	freeaddrinfo(servinfo); // all done with this structure
 	
@@ -85,8 +85,8 @@ int main(void)
 		buf[numbytes] = '\0';
 		while(numbytes!=0)
 		{
-			//printf("debug: numbytes=%d, monitor received '%s'\n",numbytes,buf);
-			printf("%s'\n",buf);
+			//printf("debug: numbytes=%d, monitor received %s\n",numbytes,buf);
+			printf("%s\n",buf);
 			numbytes=0;
 		}
 		

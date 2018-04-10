@@ -77,7 +77,7 @@ int main(void)
 	freeaddrinfo(servinfo);
 	addr_len = sizeof their_addr;
 
-	printf("listener: waiting to recvfrom...\n");
+	printf("The ServerA is up and running using UDP on port <21217>.\n");
 
 	while(1) {
 		
@@ -91,18 +91,18 @@ int main(void)
 
 		word[numbytes] = '\0';
 
-		printf("\nlistener: got packet from %s\n",
-			inet_ntop(their_addr.ss_family,
-				get_in_addr((struct sockaddr *)&their_addr),
-				s, sizeof s));
+		//printf("\nlistener: got packet from %s\n",
+			// inet_ntop(their_addr.ss_family,
+			// 	get_in_addr((struct sockaddr *)&their_addr),
+			// 	s, sizeof s));
 		//printf("listener: packet is %d bytes long\n", numbytes);
-		printf("listener: function is <%s>, word is <%s>\n ", function,word);
-		strcpy(send_data,"test: search results");
-    	printf(" SEND : %s\n",send_data);
+		printf("The ServerA received input <%s> and operation <%s>\n", function,word);
+		strcpy(send_data,"test: search results from serverA");
+    	printf(" ServerA SEND : %s\n",send_data);
 
     	numbytes = sendto(sockfd,send_data,strlen(send_data),0,
     		(struct sockaddr *)&their_addr, addr_len);
-    	printf("debug: numbytes is %d\n", numbytes);
+    	//printf("debug: numbytes is %d\n", numbytes);
     	if (numbytes==-1) {
     		perror("recv");
 	    	exit(1);
