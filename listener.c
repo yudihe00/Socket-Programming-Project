@@ -100,12 +100,12 @@ int main(void)
 				s, sizeof s));
 		//printf("listener: packet is %d bytes long\n", numbytes);
 		printf("listener: function is <%s>, word is <%s>\n ", function,word);
-		strcpy(send_data,"search results");
-    	printf(" SEND : %s",send_data);
+		strcpy(send_data,"test: search results");
+    	printf(" SEND : %s\n",send_data);
 
     	numbytes = sendto(sockfd,send_data,strlen(send_data),0,
     		(struct sockaddr *)&their_addr, addr_len);
-    	
+    	printf("debug: numbytes is %d\n", numbytes);
     	if (numbytes==-1) {
     		perror("recv");
 	    	exit(1);

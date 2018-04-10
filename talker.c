@@ -80,26 +80,27 @@ int setupUDP(char *function, char *word, char* port)
 char* udpQuery(char *function, char *word, char* port)
 {
 	int sockfd;
-	char * recv_data=(char *) malloc(1024);
+	char * return_recv_data=(char *) malloc(100);
+	char recv_data[1024];
 	sockfd=setupUDP(function,word,port);
+	int bytes_recv;
 	
-	int bytes_recv = recvfrom(sockfd,recv_data,sizeof recv_data,0, NULL, NULL);
+	bytes_recv = recvfrom(sockfd,recv_data,sizeof recv_data,0, NULL, NULL);
 	if ( bytes_recv == -1) {
 	    perror("recv");
 	    exit(1);
 	}
-   	recv_data[bytes_recv]= '\0';
+   	//recv_data[bytes_recv]= '\0';
+   	printf("debug in udpQuery: Received :%s, bytes_recv is %d\n",recv_data,bytes_recv);
 	close(sockfd);
-	return recv_data;
+	strcpy(return_recv_data,recv_data);
+	return return_recv_data;
 }
 
 int main(int argc, char *argv[])
 {
 	int sockfd;	
 	int numbytes;
-	//char recv_data[1024];
-	// char * recv_data=(char *) malloc(1024);
-	struct sockaddr_storage their_addr;
 
 	if (argc != 3) {
 		fprintf(stderr,"usage: talker function word\n");
