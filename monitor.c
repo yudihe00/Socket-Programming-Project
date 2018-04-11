@@ -31,6 +31,30 @@ void *get_in_addr(struct sockaddr *sa)
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
+//get last index of a substring of recv_data begins at index startIndex
+int getLastIndexOfStringSeg(char* recv_data, int startIndex){
+	for (int i=startIndex; i<strlen(recv_data); i++)
+	{
+		if(recv_data[i]==':'&&recv_data[i+1]==':'&&recv_data[i+2]==':')
+		{
+			return i-1;
+		}
+	}
+	return -1;
+}
+
+// get next substring from the buf
+// currentIndex and lastIndexOfSubString will change automatically every time
+char* getSubString(char *buf, int * currentIndex, int * lastIndexOfSubString ) 
+{
+	char* targetString = (char*) malloc(1000);
+	memset(targetString,'\0',1000);
+	(*lastIndexOfSubString) = getLastIndexOfStringSeg(buf, *currentIndex);
+	strncpy(targetString, buf + (*currentIndex), (*lastIndexOfSubString) - (*currentIndex) + 1);
+	*currentIndex = (*lastIndexOfSubString) + 4;
+	return targetString;
+}
+
 int main(void)
 {
 	int sockfd, numbytes;  
@@ -77,17 +101,56 @@ int main(void)
 	freeaddrinfo(servinfo); // all done with this structure
 	
 	while (1){
+		// buf format: function:::<orther part>
+		// if function is search: search:::difinition("0" if not found):::
+		// onesimilarword("0 if not found"):::onesimilarword difinition
+
 		if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
 	    perror("recv");
 	    exit(1);
 		}
 
 		buf[numbytes] = '\0';
-		while(numbytes!=0)
+		while(numbytes != 0)
 		{
 			//printf("debug: numbytes=%d, monitor received %s\n",numbytes,buf);
-			printf("%s\n",buf);
+			// printf("debug: receive from aws <%s>\n",buf); 	// format: function:::<orther part>
+															// if function is search: search:::difinition("0" if not found):::
+															// onesimilarword("0 if not found"):::onesimilarword difinition
 			numbytes=0;
+			int currentIndex=0;
+			int lastIndexOfSubString = getLastIndexOfStringSeg(buf, currentIndex);
+		
+			
+			// get function name
+			char *function = getSubString(buf,&currentIndex,&lastIndexOfSubString);
+
+			// get word name
+			char *word = getSubString(buf,&currentIndex,&lastIndexOfSubString);
+
+			if(strcmp(function,"search")==0)
+			{
+				// printf("debug: function is search\n");
+				// get definition name
+				char *definition = getSubString(buf,&currentIndex,&lastIndexOfSubString);
+
+				// printf("debug: definition is %s\n",definition);
+				if (strcmp(definition,"0")==0) {
+					printf("Didn't find a match for < %s >\n",word);
+				} else {
+					printf("Found a match for < %s >:\n< %s >\n",word, definition);
+				}
+
+				char * onesimilarword = getSubString(buf,&currentIndex,&lastIndexOfSubString);
+				if (strcmp(onesimilarword,"0")==0) {
+					printf ("Didn't find an edit distance match\n\n");
+				} 
+				else {
+					char * oneSimilarWordDefinition = getSubString(buf,&currentIndex,&lastIndexOfSubString);
+					printf("One edit distance match is <%s>:\n<%s>\n\n",onesimilarword,oneSimilarWordDefinition);
+				}
+
+			}
 		}
 		
 		//exit(0);

@@ -87,7 +87,8 @@ char* udpQuery(char *function, char *word, char* port)
 {
 	int sockfd;
 	char * return_recv_data=(char *) malloc(100);
-	char recv_data[1024];
+	memset(return_recv_data,'\0',100);
+	char recv_data[1024]="";
 	sockfd=setupUDP(function,word,port);
 	int bytes_recv;
 	
@@ -97,7 +98,7 @@ char* udpQuery(char *function, char *word, char* port)
 	    exit(1);
 	}
    	//recv_data[bytes_recv]= '\0';
-   	//printf("debug in udpQuery: Received :%s, bytes_recv is %d\n",recv_data,bytes_recv);
+   	printf("debug in udpQuery: Received :%s, bytes_recv is %d\n",recv_data,bytes_recv);
 	close(sockfd);
 	strcpy(return_recv_data,recv_data);
 	return return_recv_data;
@@ -275,6 +276,74 @@ void sendSearchResult(char* word, char* recv_dataA, char* recv_dataB, char* recv
 
 }
 
+void sendPrefixOrSuffixResult(char* word, char* recv_dataA, char* recv_dataB, char* recv_dataC)
+{
+	int currentIndex=0;
+	int lastIndexOfSubstring=lastIndexOfStringSeg(recv_dataA,currentIndex);
+	char tempString[10]="";
+	char wordsString[5000]="";
+	char combinedWordsString[5000]="";
+	char returnString[5000]="fix:::";
+	strcat(returnString,word);
+	strcat(returnString,":::");
+	int number = 0; //temp place to save a number of words from one server
+	int numberTotal = 0; // total number of words
+	
+	// get number of words in recv_dataA
+	strncpy(tempString,recv_dataA+currentIndex,lastIndexOfSubstring - currentIndex+1);
+	currentIndex = lastIndexOfSubstring + 4;
+	number = atoi(tempString);
+	printf("debug: numberA is %d\n", number);
+	numberTotal += number;
+
+	if (number!=0){
+		strncpy(wordsString,recv_dataA+currentIndex,strlen(recv_dataA) - currentIndex);
+		strcat(combinedWordsString,wordsString);
+		printf("debug: wordsString is %s\n", wordsString);
+	}
+
+	// get number of words in recv_dataB
+	memset(wordsString,'\0',strlen(wordsString));
+	memset(tempString,'\0',strlen(tempString));
+	currentIndex=0;
+	lastIndexOfSubstring=lastIndexOfStringSeg(recv_dataB,currentIndex);
+	strncpy(tempString,recv_dataB+currentIndex,lastIndexOfSubstring - currentIndex+1);
+	currentIndex = lastIndexOfSubstring + 4;
+	number = atoi(tempString);
+	printf("debug: numberB is %d\n", number);
+	numberTotal += number;
+	if (number!=0){
+		strncpy(wordsString,recv_dataB+currentIndex,strlen(recv_dataB) - currentIndex);
+		strcat(combinedWordsString,wordsString);
+		printf("debug: wordsString is %s\n", wordsString);
+	}
+
+	// get number of words in recv_dataC
+	memset(wordsString,'\0',strlen(wordsString));
+	memset(tempString,'\0',strlen(tempString));
+	currentIndex=0;
+	lastIndexOfSubstring=lastIndexOfStringSeg(recv_dataC,currentIndex);
+	strncpy(tempString,recv_dataC+currentIndex,lastIndexOfSubstring - currentIndex+1);
+	currentIndex = lastIndexOfSubstring + 4;
+	number = atoi(tempString);
+	printf("debug: numberC is %d\n", number);
+	numberTotal += number;
+	if (number!=0){
+		strncpy(wordsString,recv_dataC+currentIndex,strlen(recv_dataC) - currentIndex);
+		printf("debug: wordsString is %s\n", wordsString);
+		strcat(combinedWordsString,wordsString);
+		printf("debug: number total is %d\n", numberTotal);
+		printf("debug: final wordsString is %s\n", combinedWordsString);
+	}
+	char numString[20];
+	sprintf(numString, "%d", numberTotal);
+	strcat(returnString,numString);
+	strcat(returnString,":::");
+	strcat(returnString,combinedWordsString);
+	printf("debug: return string is %s\n", returnString);
+
+}
+
 int main(int argc, char *argv[])
 {
 	int sockfd;	
@@ -294,7 +363,7 @@ int main(int argc, char *argv[])
 	char *recv_dataC=udpQuery(function,word,SERVERPORTC);
 	printf("ReceivedA :%s\n",recv_dataA);
 	printf("ReceivedB :%s\n",recv_dataB);
-	printf("ReceivedC :%s\n",recv_dataB);
+	printf("ReceivedC :%s\n",recv_dataC);
 
 	//combine result of ABC
 	//if function is search
@@ -302,6 +371,9 @@ int main(int argc, char *argv[])
 		//strcpy(returnString, getSearchResultString(word, recv_dataA, recv_dataB, recv_dataC));
 		//printf("debug: the final return string is %s\n",returnString);
 		sendSearchResult(word, recv_dataA, recv_dataB, recv_dataC);
+	}
+	else if (strcmp(function,"suffix")==0 ||strcmp(function,"prefix")==0) {
+		sendPrefixOrSuffixResult(word, recv_dataA, recv_dataB, recv_dataC);
 	}
 	return 0;
 }

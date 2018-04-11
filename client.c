@@ -31,6 +31,30 @@ void *get_in_addr(struct sockaddr *sa)
 	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
+//get last index of a substring of recv_data begins at index startIndex
+int getLastIndexOfStringSeg(char* recv_data, int startIndex){
+	for (int i=startIndex; i<strlen(recv_data); i++)
+	{
+		if(recv_data[i]==':'&&recv_data[i+1]==':'&&recv_data[i+2]==':')
+		{
+			return i-1;
+		}
+	}
+	return -1;
+}
+
+// get next substring from the buf
+// currentIndex and lastIndexOfSubString will change automatically every time
+char* getSubString(char *buf, int * currentIndex, int * lastIndexOfSubString ) 
+{
+	char* targetString = (char*) malloc(1000);
+	memset(targetString,'\0',1000);
+	(*lastIndexOfSubString) = getLastIndexOfStringSeg(buf, *currentIndex);
+	strncpy(targetString, buf + (*currentIndex), (*lastIndexOfSubString) - (*currentIndex) + 1);
+	*currentIndex = (*lastIndexOfSubString) + 4;
+	return targetString;
+}
+
 int main(int argc, char *argv[])
 {
 	int sockfd, numbytes;  
@@ -100,6 +124,30 @@ int main(int argc, char *argv[])
 	buf[numbytes] = '\0';
 
 	printf("debug: client: received '%s' from aws\n",buf);
+
+	// process buf
+	int currentIndex=0;
+	int lastIndexOfSubString = getLastIndexOfStringSeg(buf, currentIndex);
+	// get function name
+	char *function = getSubString(buf,&currentIndex,&lastIndexOfSubString);
+
+	// get word name
+	char *word = getSubString(buf,&currentIndex,&lastIndexOfSubString);
+	if(strcmp(function,"search")==0)
+	{
+		// printf("debug: function is search\n");
+		// get definition name
+		char *definition = getSubString(buf,&currentIndex,&lastIndexOfSubString);
+
+		// printf("debug: definition is %s\n",definition);
+		if (strcmp(definition,"0")==0) {
+			printf("Didn't find a match for < %s >\n",word);
+		} else {
+			printf("Found a match for < %s >:\n< %s >\n",word, definition);
+		}
+
+	}
+
 
 	close(sockfd);
 

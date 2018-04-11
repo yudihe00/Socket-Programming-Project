@@ -167,10 +167,10 @@ int setupUDP(char *function, char *word, char* port)
 		exit(1);
 	}
 	if (strcmp(port,SERVERPORTA)==0) {
-		printf("talker: sent <%s> and <%s> to Backend-Server A\n", function, word);
+		printf("Sent <%s> and <%s> to Backend-Server A\n", function, word);
 	} else if (strcmp(port,SERVERPORTB)==0) {
-		printf("talker: sent <%s> and <%s> to Backend-Server B\n", function, word);
-	} else printf("talker: sent <%s> and <%s> to Backend-Server B\n", function, word);
+		printf("Sent <%s> and <%s> to Backend-Server B\n", function, word);
+	} else printf("Sent <%s> and <%s> to Backend-Server B\n", function, word);
 	
 	//printf("talker: sent <%s> and <%s> to %s\n", function, word, IPADDRESS);
 
@@ -185,7 +185,8 @@ char* udpQuery(char *function, char *word, char* port)
 {
 	int sockfd;
 	char * return_recv_data=(char *) malloc(100); // return to main
-	char recv_data[1024]; // save the udp return result
+	memset(return_recv_data,'\0',100);
+	char recv_data[1024]=""; // save the udp return result
 	sockfd=setupUDP(function,word,port);
 	int bytes_recv;
 	
@@ -202,12 +203,16 @@ char* udpQuery(char *function, char *word, char* port)
 }
 
 // send text[] to monitor
-void send_to_monitor(char text[], int new_fd_monitor)
+int send_to_monitor(char text[], int new_fd_monitor)
 {	
 	char text2[1000];
 	strcpy (text2,text);
 	if (send(new_fd_monitor, text, strlen(text2), 0) == -1)
-				perror("send");
+	{
+		perror("send");
+		return -1;
+	}
+	return 0;
 }
 
 //get last index of a substring of recv_data begins at index startIndex
@@ -315,7 +320,7 @@ struct searchResult oneSearch(char *recv_data)
 }
 
 // send search result to client and monitor
-void sendSearchResult(char* word, char* recv_dataA, char* recv_dataB, char* recv_dataC)
+void sendSearchResult(char* word, char* recv_dataA, char* recv_dataB, char* recv_dataC,  int new_fd, int new_fd_monitor)
 {
 	char matchNumberString[10]="0"; //number of same words
 	char similarNumberString[10]="0";
@@ -323,7 +328,14 @@ void sendSearchResult(char* word, char* recv_dataA, char* recv_dataB, char* recv
 	char oneSimilarWord[100]="0";
 	char oneSimilarWordDifinition[101]=""; //difinition of one of the similar word
 	// char similarWordString[4000];
-	char returnString[300]=""; // the result sendback to client and monitor
+
+	// returnString[300]: the result sendback to client and monitor
+	// format: search:::word:::difinition("0" if not found):::
+	// onesimilarword("0 if not found",end):::onesimilarword difinition
+	char returnString[300]="search:::"; 
+	strcat(returnString,word);
+	strcat(returnString,":::");
+
 	struct searchResult resultA;
 	struct searchResult resultB;
 	struct searchResult resultC;
@@ -373,9 +385,26 @@ void sendSearchResult(char* word, char* recv_dataA, char* recv_dataB, char* recv
 		strcat(returnString,oneSimilarWordDifinition);
 		strcat(returnString,":::");
 	}
-	printf("debug: the return string is %s\n", returnString);
+	printf("debug: the return string is <%s>\n", returnString);
 	//return returnString;
 
+	// send search result back to client
+	if (send(new_fd, returnString, strlen(returnString), 0) == -1)
+		perror("send");
+	
+	else printf("The AWS sent <%s> matches to client\n", matchNumberString);
+	
+
+	// send to monitor
+	// char test3[1000]="aws send to monitor !";
+	if(send_to_monitor(returnString,new_fd_monitor)!=-1){
+		
+		if (strcmp(oneSimilarWord,"0")==0 ){ //didn't find similar word, only send word to monitor
+			printf("The AWS sent <%s> to client to the monitor via TCP port <26217>\n", word);
+		}
+		else printf("The AWS sent <%s> and <%s> to client to the monitor via TCP port <26217>\n", word,oneSimilarWord);
+	}
+	
 	// printf("debug: test for B, matchNumber for non exist word is %d\n",resultB.matchNumber);
 	// printf("debug: test for B, one similar word is <%s>, definition is <%s>\n",resultB.oneSimilarWord, resultB.oneSimilarWordDifinition);
 
@@ -471,16 +500,12 @@ int main(void)
 			//combine result of ABC
 			//if function is search
 			if (strcmp(function,"search")==0){
-				sendSearchResult(word, recv_dataA, recv_dataB, recv_dataC);
+				sendSearchResult(word, recv_dataA, recv_dataB, recv_dataC, new_fd, new_fd_monitor);
 			}
 
-			// send search result back to client
-			if (send(new_fd, recv_dataA, strlen(recv_dataA), 0) == -1)
-				perror("send");
-
-			// send to monitor
-			char test3[1000]="aws send to monitor !";
-			send_to_monitor(test3,new_fd_monitor);
+			if (send(new_fd, "temp from aws", 13, 0) == -1)
+			perror("send");
+			
 
 			close(new_fd);
 			exit(0);
