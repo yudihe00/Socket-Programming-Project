@@ -119,29 +119,23 @@ char* search(char word[],FILE* file)
     }
 
     //change int to string
+    if (similarWordNumber>1) similarWordNumber=1;
     char numberString[10];
     sprintf(numberString,"%d",similarWordNumber);
     printf("and < %d > similar words\n", similarWordNumber);
     strcat(returnString,numberString);
     strcat(returnString,":::");
 
-    // add similar word to return string
-    int i;
-    for (i=0; i<similarWordNumber; i++) {
-        // printf("debug: i=%d, the final similar word is %s\n", i, similarWord[i]);
-        strcat(returnString,similarWord[i]);
-        strcat(returnString,":::");
-    }
-    //printf("return string is <%s>\n", returnString);
+    //add the first similar word and its definition
     if (similarWordNumber!=0){
         // printf("One edit distance match is <%s>, definition is <%s>\n",similarWord[i-1], definition2);
-        strcat(returnString,similarWord[i-1]);
+        strcat(returnString,similarWord[0]);
         strcat(returnString,":::");
         strcat(returnString,definition2);
         strcat(returnString,":::");
     }
     //printf("debug:word is %s\n",word);
-    // printf("final return string is <%s>\n", returnString);
+    //printf("debug:final return string is <%s>\n", returnString);
     return returnString;
 }
 
