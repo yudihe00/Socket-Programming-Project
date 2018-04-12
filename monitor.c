@@ -109,13 +109,13 @@ int main(void)
 	    perror("recv");
 	    exit(1);
 		}
-		printf("debug: receive from aws <%s>\n",buf);
+		// printf("debug: receive from aws <%s>\n",buf);
 
 		buf[numbytes] = '\0';
 		while(numbytes != 0)
 		{
 			//printf("debug: numbytes=%d, monitor received %s\n",numbytes,buf);
-			printf("debug: receive from aws <%s>\n",buf); 	// format: function:::<orther part>
+			// printf("debug: receive from aws <%s>\n",buf); 	// format: function:::<orther part>
 															// if function is search: search:::difinition("0" if not found):::
 															// onesimilarword("0 if not found"):::onesimilarword difinition
 			numbytes=0;
