@@ -24,7 +24,7 @@ I have completed all parts of requirement including extra points part.
 1. Execute search hack
 - aws console
 The AWS is up and running.
-The AWS received input=<hack> and function=<search> from the client using TCP over port 25217
+The AWS received input=<%hack%> and function=<search> from the client using TCP over port 25217
 Sent <search> and <hack> to Backend-Server A
 Sent <search> and <hack> to Backend-Server B
 Sent <search> and <hack> to Backend-Server C
