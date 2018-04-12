@@ -181,7 +181,7 @@ char* prefix(char word[],FILE* file)
         }
         
     }
-    printf("debug: prefix word number is %d\n", prefixWordNumber);
+    // printf("debug: prefix word number is %d\n", prefixWordNumber);
     //printf("return string is <%s>\n", returnString);
     //change int to string
     char numberString[10];

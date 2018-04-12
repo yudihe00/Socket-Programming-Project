@@ -2,9 +2,6 @@
 ** aws.c
 ** Yudi He
 ** ID: 5670857217
-UDP port 23217
-TCP with client 25217 
-TCP with monitor 26217
 */
 
 #include <stdio.h>
