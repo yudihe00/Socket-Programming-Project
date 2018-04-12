@@ -170,7 +170,7 @@ int setupUDP(char *function, char *word, char* port)
 		printf("Sent <%s> and <%s> to Backend-Server A\n", function, word);
 	} else if (strcmp(port,SERVERPORTB)==0) {
 		printf("Sent <%s> and <%s> to Backend-Server B\n", function, word);
-	} else printf("Sent <%s> and <%s> to Backend-Server B\n", function, word);
+	} else printf("Sent <%s> and <%s> to Backend-Server C\n", function, word);
 	
 	//printf("talker: sent <%s> and <%s> to %s\n", function, word, IPADDRESS);
 
@@ -184,9 +184,9 @@ int setupUDP(char *function, char *word, char* port)
 char* udpQuery(char *function, char *word, char* port)
 {
 	int sockfd;
-	char * return_recv_data=(char *) malloc(100); // return to main
+	char * return_recv_data=(char *) malloc(4000); // return to main
 	memset(return_recv_data,'\0',100);
-	char recv_data[1024]=""; // save the udp return result
+	char recv_data[4000]=""; // save the udp return result
 	sockfd=setupUDP(function,word,port);
 	int bytes_recv;
 	
@@ -205,7 +205,7 @@ char* udpQuery(char *function, char *word, char* port)
 // send text[] to monitor
 int send_to_monitor(char text[], int new_fd_monitor)
 {	
-	char text2[1000];
+	char text2[4000];
 	strcpy (text2,text);
 	if (send(new_fd_monitor, text, strlen(text2), 0) == -1)
 	{
@@ -237,15 +237,6 @@ struct searchResult {
 	char oneSimilarWordDifinition[101];
 };
 
-// // Convert string to int
-// int stringToInt(const char* snum){
-// 	int dec;
-// 	int len = strlen(snum);
-// 	for(int i=0; i<len; i++){
-// 		dec = dec * 10 + ( snum[i] - '0' );
-// 	}
-// 	return dec;
-// }
 
 // Process similar word part of the recv_data search funciton
 // Return the struct searchResult with similar relavant variable
@@ -261,18 +252,10 @@ struct searchResult similarResultInOneSearch(int currentIndex, struct searchResu
 	if (strcmp(tempString,"1")==0) {
 		returnResult.similarNumber=1;
 	} else returnResult.similarNumber=0;
-	printf("debug: number of similar word, tempString is %s, number is %d\n",tempString,returnResult.similarNumber);
+	// printf("debug: number of similar word, tempString is %s, number is %d\n",tempString,returnResult.similarNumber);
 	
 	if(returnResult.similarNumber==0) return returnResult; // No similar word
 	else { // have similar words
-		// // put all similar words in one string
-		// currentIndex=lastIndexOfSubstring+4; // First index of the first similar word
-		// lastIndexOfSubstring=lastIndexOfStringSeg(recv_data,currentIndex);
-		// int wordLength = lastIndexOfSubstring - currentIndex + 1;
-		// printf("debug: wordLength is %d\n",wordLength);
-		// lastIndexOfSubstring = currentIndex-1 + (wordLength+3) * returnResult.similarNumber;
-		// strncpy(returnResult.similarWords,recv_data+currentIndex,lastIndexOfSubstring - currentIndex+1);
-		// printf("debug: similarWords string is %s\n", returnResult.similarWords);
 		
 		// get one similar word
 		currentIndex=lastIndexOfSubstring+4;
@@ -309,7 +292,7 @@ struct searchResult oneSearch(char *recv_data)
 		// get one definition of that word
 		lastIndexOfSubstring=lastIndexOfStringSeg(recv_data,currentIndex);
 		strncpy(returnResult.definition,recv_data+currentIndex,lastIndexOfSubstring - currentIndex+1);
-		printf("debug: definition is <%s>\n", returnResult.definition);
+		// printf("debug: definition is <%s>\n", returnResult.definition);
 
 		// get similar word number 
 		currentIndex = lastIndexOfSubstring+4;
@@ -385,7 +368,7 @@ void sendSearchResult(char* word, char* recv_dataA, char* recv_dataB, char* recv
 		strcat(returnString,oneSimilarWordDifinition);
 		strcat(returnString,":::");
 	}
-	printf("debug: the return string is <%s>\n", returnString);
+	// printf("debug: the return string is <%s>\n", returnString);
 	//return returnString;
 
 	// send search result back to client
@@ -410,6 +393,90 @@ void sendSearchResult(char* word, char* recv_dataA, char* recv_dataB, char* recv
 
 }
 
+void sendPrefixOrSuffixResult(char* word, char* recv_dataA, char* recv_dataB, char* recv_dataC, int new_fd, int new_fd_monitor)
+{
+	int currentIndex=0;
+	int lastIndexOfSubstring=lastIndexOfStringSeg(recv_dataA,currentIndex);
+	char tempString[10]="";
+	char wordsString[5000]="";
+	char combinedWordsString[5000]="";
+	char returnString[5000]="fix:::";
+	strcat(returnString,word);
+	strcat(returnString,":::");
+	int number = 0; //temp place to save a number of words from one server
+	int numberTotal = 0; // total number of words
+	
+	// get number of words in recv_dataA
+	strncpy(tempString,recv_dataA+currentIndex,lastIndexOfSubstring - currentIndex+1);
+	currentIndex = lastIndexOfSubstring + 4;
+	number = atoi(tempString);
+	printf("The AWS received <%d> matches from Backend-Server <A> using UDP over port <21217>\n", number);
+	// printf("debug: numberA is %d\n", number);
+	numberTotal += number;
+
+	if (number!=0){
+		strncpy(wordsString,recv_dataA+currentIndex,strlen(recv_dataA) - currentIndex);
+		strcat(combinedWordsString,wordsString);
+		// printf("debug: wordsString is %s\n", wordsString);
+	}
+
+	// get number of words in recv_dataB
+	memset(wordsString,'\0',strlen(wordsString));
+	memset(tempString,'\0',strlen(tempString));
+	currentIndex=0;
+	lastIndexOfSubstring=lastIndexOfStringSeg(recv_dataB,currentIndex);
+	strncpy(tempString,recv_dataB+currentIndex,lastIndexOfSubstring - currentIndex+1);
+	currentIndex = lastIndexOfSubstring + 4;
+	number = atoi(tempString);
+	// printf("debug: numberB is %d\n", number);
+	printf("The AWS received <%d> matches from Backend-Server <B> using UDP over port <22217>\n", number);
+	numberTotal += number;
+	if (number!=0){
+		strncpy(wordsString,recv_dataB+currentIndex,strlen(recv_dataB) - currentIndex);
+		strcat(combinedWordsString,wordsString);
+		// printf("debug: wordsString is %s\n", wordsString);
+	}
+
+	// get number of words in recv_dataC
+	memset(wordsString,'\0',strlen(wordsString));
+	memset(tempString,'\0',strlen(tempString));
+	currentIndex=0;
+	lastIndexOfSubstring=lastIndexOfStringSeg(recv_dataC,currentIndex);
+	strncpy(tempString,recv_dataC+currentIndex,lastIndexOfSubstring - currentIndex+1);
+	currentIndex = lastIndexOfSubstring + 4;
+	number = atoi(tempString);
+	printf("The AWS received <%d> matches from Backend-Server <C> using UDP over port <23217>\n", number);
+	// printf("debug: numberC is %d\n", number);
+	numberTotal += number;
+	if (number!=0){
+		strncpy(wordsString,recv_dataC+currentIndex,strlen(recv_dataC) - currentIndex);
+		// printf("debug: wordsString is %s\n", wordsString);
+		strcat(combinedWordsString,wordsString);
+		// printf("debug: number total is %d\n", numberTotal);
+		// printf("debug: final wordsString is %s\n", combinedWordsString);
+	}
+	char numString[20];
+	sprintf(numString, "%d", numberTotal);
+	strcat(returnString,numString);
+	strcat(returnString,":::");
+	strcat(returnString,combinedWordsString);
+	// printf("debug: return string is %s\n", returnString);
+
+	// send search result back to client
+	if (send(new_fd, returnString, strlen(returnString), 0) == -1)
+		perror("send");
+	
+	else printf("The AWS sent <%d> matches to client\n", numberTotal);
+	
+
+	// send to monitor
+	// char test3[1000]="aws send to monitor !";
+	send_to_monitor(returnString,new_fd_monitor);
+	printf("The AWS sent <%d> matches to the monitor via TCP port <26217>\n", numberTotal);
+		
+
+}
+
 int main(void)
 {
 	int sockfd, new_fd;  // listen on sock_fd, new connection on new_fd
@@ -431,6 +498,7 @@ int main(void)
 	int monitorOn=0;
 	while (monitorOn == 0){
 		// child socket connect with monitor
+		sin_size = sizeof their_addr;
 		new_fd_monitor = accept(sockfd_monitor, (struct sockaddr *)&their_addr, &sin_size);
 		if (new_fd_monitor == -1) {
 			perror("accept");
@@ -474,39 +542,50 @@ int main(void)
 				exit(1);
 			}
 			function[numbytes] = '\0';
-			printf("debug: function is %s\n", function);
+			// printf("debug: function is %s\n", function);
 			//strcpy(function,buf);
 			if ((numbytes = recv(new_fd, word, sizeof word, 0)) == -1) {
 				perror("recv");
 				exit(1);
 			}
 			word[numbytes] = '\0';
-			printf("debug: word is %s\n", word );
+			// printf("debug: word is %s\n", word );
 			
 			printf("The AWS received input=<%s> and function=<%s> from the client using TCP over port 25217\n",word,function);
 
+			char recv_dataA[4000]="";
+			char recv_dataB[4000]="";
+			char recv_dataC[4000]="";
 			//test for udp
-			char *recv_dataA=udpQuery(function,word,SERVERPORTA);
-			printf("debug: Received from serverA: %s\n",recv_dataA);
+			char *recvTemp = udpQuery(function,word,SERVERPORTA);
+			strcpy(recv_dataA,recvTemp);
+			free(recvTemp);
+			recvTemp = NULL;
+			// printf("debug: Received from serverA: %s\n",recv_dataA);
 
 			//test for udp
-			char *recv_dataB=udpQuery(function,word,SERVERPORTB);
-			printf("debug: Received from serverB: %s\n",recv_dataB);
+			recvTemp=udpQuery(function,word,SERVERPORTB);
+			strcpy(recv_dataB,recvTemp);
+			free(recvTemp);
+			recvTemp = NULL;
+			// printf("debug: Received from serverB: %s\n",recv_dataB);
 
 			//test for udp
-			char *recv_dataC=udpQuery(function,word,SERVERPORTC);
-			printf("debug: Received from serverC: %s\n",recv_dataC);
+			recvTemp=udpQuery(function,word,SERVERPORTC);
+			strcpy(recv_dataC,recvTemp);
+			free(recvTemp);
+			recvTemp = NULL;
+			// printf("debug: Received from serverC: %s\n",recv_dataC);
 
 			//combine result of ABC
 			//if function is search
 			if (strcmp(function,"search")==0){
 				sendSearchResult(word, recv_dataA, recv_dataB, recv_dataC, new_fd, new_fd_monitor);
 			}
-
-			if (send(new_fd, "temp from aws", 13, 0) == -1)
-			perror("send");
+			else if (strcmp(function,"suffix")==0 ||strcmp(function,"prefix")==0) {
+				sendPrefixOrSuffixResult(word, recv_dataA, recv_dataB, recv_dataC, new_fd, new_fd_monitor);
+			}
 			
-
 			close(new_fd);
 			exit(0);
 		}

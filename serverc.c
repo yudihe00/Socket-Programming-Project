@@ -1,5 +1,7 @@
 /*
 ** serverb.c 
+** Yudi He
+** ID: 5670857217
 based on datagram sockets "server" demo, listener.c in beej
 */
 
@@ -16,7 +18,7 @@ based on datagram sockets "server" demo, listener.c in beej
 
 #define MYPORT "23217"	// the port users will be connecting to, Server C
 
-#define MAXBUFLEN 100
+#define MAXBUFLEN 4000
 
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
@@ -293,7 +295,7 @@ int main(void)
 	char word[MAXBUFLEN];
 	socklen_t addr_len;
 	char s[INET6_ADDRSTRLEN];
-	char send_data[1024];
+	char send_data[MAXBUFLEN];
 
 	char *fileName="backendC.txt";
 	char * returnString;

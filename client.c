@@ -18,7 +18,7 @@
 
 #define PORT "25217" // the TCP port of aws that client connect to
 
-#define MAXDATASIZE 100 // max number of bytes we can get at once 
+#define MAXDATASIZE 5000 // max number of bytes we can get at once 
 #define IPADDRESS "127.0.0.1"
 
 // get sockaddr, IPv4 or IPv6:
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
 	buf[numbytes] = '\0';
 
-	printf("debug: client: received '%s' from aws\n",buf);
+	// printf("debug: client: received '%s' from aws\n",buf);
 
 	// process buf
 	int currentIndex=0;
@@ -146,6 +146,22 @@ int main(int argc, char *argv[])
 			printf("Found a match for < %s >:\n< %s >\n",word, definition);
 		}
 
+	}
+	else if(strcmp(function,"fix")==0){
+		char *number = getSubString(buf,&currentIndex,&lastIndexOfSubString);
+		char number2[10];
+		strcpy(number2,number);
+		if(strcmp(number,"0")==0){
+			printf("\nFound no matches for <%s>\n",word);
+		} else {
+			int number=atoi(number2);
+			printf("\nFound <%d> matches for <%s>:\n",number,word);
+			while(number!=0){
+				char *oneWord=getSubString(buf,&currentIndex,&lastIndexOfSubString);
+				printf("<%s>\n", oneWord);
+				number--;
+			}
+		}
 	}
 
 

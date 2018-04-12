@@ -18,7 +18,7 @@
 
 #define PORT "26217" // the TCP port of aws that monitor connect to
 
-#define MAXDATASIZE 1024 // max number of bytes we can get at once 
+#define MAXDATASIZE 4000 // max number of bytes we can get at once 
 #define IPADDRESS "127.0.0.1"
 
 // get sockaddr, IPv4 or IPv6:
@@ -109,12 +109,13 @@ int main(void)
 	    perror("recv");
 	    exit(1);
 		}
+		printf("debug: receive from aws <%s>\n",buf);
 
 		buf[numbytes] = '\0';
 		while(numbytes != 0)
 		{
 			//printf("debug: numbytes=%d, monitor received %s\n",numbytes,buf);
-			// printf("debug: receive from aws <%s>\n",buf); 	// format: function:::<orther part>
+			printf("debug: receive from aws <%s>\n",buf); 	// format: function:::<orther part>
 															// if function is search: search:::difinition("0" if not found):::
 															// onesimilarword("0 if not found"):::onesimilarword difinition
 			numbytes=0;
@@ -150,6 +151,22 @@ int main(void)
 					printf("One edit distance match is <%s>:\n<%s>\n\n",onesimilarword,oneSimilarWordDefinition);
 				}
 
+			}
+			else if(strcmp(function,"fix")==0){
+				char *number = getSubString(buf,&currentIndex,&lastIndexOfSubString);
+				char number2[10];
+				strcpy(number2,number);
+				if(strcmp(number,"0")==0){
+					printf("\nFound no matches for <%s>\n",word);
+				} else {
+					int number=atoi(number2);
+					printf("\nFound <%d> matches for <%s>:\n",number,word);
+					while(number!=0){
+						char *oneWord=getSubString(buf,&currentIndex,&lastIndexOfSubString);
+						printf("<%s>\n", oneWord);
+						number--;
+					}
+				}
 			}
 		}
 		
