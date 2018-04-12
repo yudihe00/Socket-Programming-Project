@@ -1,4 +1,4 @@
-# ee450-project  
+# ee450-project-18spring  
 Name: Yudi He    
 ID: 5670857217    
 ### What I have done  
@@ -23,16 +23,16 @@ I have completed all parts of requirement including extra points part.
 ### Messages exchange format example  
 1. Execute search hack  
 - aws console  
-The AWS is up and running      
-The AWS received input=<%hack%> and function=<search> from the client using TCP over port 25217      
-Sent <search> and <hack> to Backend-Server A    
-Sent <search> and <hack> to Backend-Server B    
-Sent <search> and <hack> to Backend-Server C    
-The AWS received <1> similar words from Backend-Server <A> using UDP over port <21217>    
-The AWS received <1> similar words from Backend-Server <B> using UDP over port <22217>   
-The AWS received <1> similar words from Backend-Server <C> using UDP over port <23217>   
-The AWS sent <1> matches to client   
-The AWS sent <hack> and <Jack> to client to the monitor via TCP port <26217>   
+The AWS is up and running.  
+The AWS received input=<hack> and function=<search> from the client using TCP over port 25217  
+Sent <search> and <hack> to Backend-Server A  
+Sent <search> and <hack> to Backend-Server B  
+Sent <search> and <hack> to Backend-Server C  
+The AWS received <1> similar words from Backend-Server <A> using UDP over port <21217>  
+The AWS received <1> similar words from Backend-Server <B> using UDP over port <22217>  
+The AWS received <1> similar words from Backend-Server <C> using UDP over port <23217>  
+The AWS sent <1> matches to client  
+The AWS sent <hack> and <Jack> to client to the monitor via TCP port <26217>  
 
   - client console  
 The client is up and running.”  
@@ -166,8 +166,8 @@ The Server C received input <suffix> and operation <ntable>
 The Server C has found < 2 > matches  
 The Server C finished sending the output to AWS  
 
-  ### Idiosyncrasy of my project  
+  ### Idiosyncrasy of my project.  
 I set maximum size of the TCP and UTP buffer as 4000, if the searching result of prefix and suffix is very long, such as the input word only has one character the memory will crash.  
 
   ### Reused Code  
-My TCP and UDP setting up code is based on examples in Beej's book.  
+My TCP and UDP setting up code is based on examples in Beej's book.  .
