@@ -13,6 +13,7 @@ I have completed all parts of requirement including extra points part.
     - AWS combines returning result from three back-end servers and send the combined result to monitor and client.  
 4. Phase 3 (**extra points**)  
     - I also implement the suffix function.  
+
 ### Code files  
 ***aws.c***  
 ***client.c***  
@@ -33,8 +34,7 @@ The AWS received <1> similar words from Backend-Server <B> using UDP over port <
 The AWS received <1> similar words from Backend-Server <C> using UDP over port <23217>  
 The AWS sent <1> matches to client  
 The AWS sent <hack> and <Jack> to client to the monitor via TCP port <26217>  
-
-  - client console  
+- client console  
 The client is up and running.”  
 The client sent <hack> and <search> to AWS.  
 Found a match for < hack >:  
@@ -45,26 +45,22 @@ Found a match for < hack >:
 < Hackneyed; hired; mercenary. >  
 One edit distance match is <Jack>:  
 <"To wash on a rack  as metals or ore.">  
-
-  - servera console  
+- servera console  
 The Server A is up and running using UDP on port <21217>.  
 The Server A received input <search> and operation <hack>  
 The Server A has found < 0 > matches and < 1 > similar words  
 The Server A finished sending the output to AWS  
-
-  - serverb console  
+- serverb console  
 The Server B is up and running using UDP on port <22217>.  
 The Server B received input <search> and operation <hack>  
 The Server B has found < 1 > matches and < 1 > similar words  
 The Server B finished sending the output to AWS  
-
-  - serverc console  
+- serverc console  
 The Server C is up and running using UDP on port <23217>.  
 The Server C received input <search> and operation <hack>  
 The Server C has found < 1 > matches and < 1 > similar words  
 The Server C finished sending the output to AWS  
-
-  2. Execute <prefix> <accuse>  
+2. Execute <prefix> <accuse>  
 - aws console  
 The AWS is up and running.  
 The AWS received input=<accus> and function=<prefix> from the client using TCP over port 25217  
@@ -76,8 +72,7 @@ The AWS received <3> matches from Backend-Server <B> using UDP over port <22217>
 The AWS received <3> matches from Backend-Server <C> using UDP over port <23217>  
 The AWS sent <7> matches to client  
 The AWS sent <7> matches to the monitor via TCP port <26217>  
-
-  - client console  
+- client console  
 The client is up and running.”  
 The client sent <accus> and <prefix> to AWS.  
 Found <7> matches for <accus>:  
@@ -88,8 +83,7 @@ Found <7> matches for <accus>:
 <Accustom>  
 <Accuse>  
 <Accusement>  
-
-  - monitor console  
+- monitor console  
 The monitor is up and running.  
 Found <7> matches for <accus>:  
 <Accustomed>  
@@ -99,26 +93,22 @@ Found <7> matches for <accus>:
 <Accustom>  
 <Accuse>  
 <Accusement>  
-
-  - servera console  
+- servera console  
 The Server A is up and running using UDP on port <21217>.  
 The Server A received input <prefix> and operation <accus>  
 The Server A has found < 1 > matches  
 The Server A finished sending the output to AWS  
-
-  - serverb console  
+- serverb console  
 The Server B is up and running using UDP on port <22217>.  
 The Server B received input <prefix> and operation <accus>  
 The Server B has found < 3 > matches  
 The Server B finished sending the output to AWS  
-
-  - serverc console  
+- serverc console  
 The Server C is up and running using UDP on port <23217>.  
 The Server C received input <prefix> and operation <accus>  
 The Server C has found < 3 > matches  
 The Server C finished sending the output to AWS  
-
-  3. Execute <suffix> <ntable>  
+3. Execute <suffix> <ntable>  
 - aws console  
 The AWS is up and running.  
 The AWS received input=<ntable> and function=<suffix> from the client using TCP over port 25217  
@@ -130,8 +120,7 @@ The AWS received <1> matches from Backend-Server <B> using UDP over port <22217>
 The AWS received <2> matches from Backend-Server <C> using UDP over port <23217>  
 The AWS sent <4> matches to client  
 The AWS sent <4> matches to the monitor via TCP port <26217>  
-
-  - client console  
+- client console  
 The client is up and running.”  
 The client sent <ntable> and <suffix> to AWS.  
 Found <4> matches for <ntable>:  
@@ -139,35 +128,31 @@ Found <4> matches for <ntable>:
 <Acquaintable>  
 <Accountable>  
 <Fermentable>  
-
-  - monitor console  
+- monitor console  
 The monitor is up and running.  
 Found <4> matches for <ntable>:  
 <Replantable>  
 <Acquaintable>  
 <Accountable>  
 <Fermentable>  
-
-  - servera console  
+- servera console  
 The Server A is up and running using UDP on port <21217>.  
 The Server A received input <suffix> and operation <ntable>  
 The Server A has found < 1 > matches  
 The Server A finished sending the output to AWS  
-
-  - serverb console  
+- serverb console  
 The Server B is up and running using UDP on port <22217>.  
 The Server B received input <suffix> and operation <ntable>  
 The Server B has found < 1 > matches  
 The Server B finished sending the output to AWS  
-
-  - serverc console  
+- serverc console  
 The Server C is up and running using UDP on port <23217>.  
 The Server C received input <suffix> and operation <ntable>  
 The Server C has found < 2 > matches  
 The Server C finished sending the output to AWS  
 
-  ### Idiosyncrasy of my project.  
+### Idiosyncrasy of my project.  
 I set maximum size of the TCP and UTP buffer as 4000, if the searching result of prefix and suffix is very long, such as the input word only has one character the memory will crash.  
 
-  ### Reused Code  
-My TCP and UDP setting up code is based on examples in Beej's book.  .
+### Reused Code  
+My TCP and UDP setting up code is based on examples in Beej's book.  
