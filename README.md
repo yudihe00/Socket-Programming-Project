@@ -3,7 +3,7 @@ Name: Yudi He
 ID: 5670857217    
 ### What I have done  
 I have completed all parts of requirement including extra points part.     
-1.  Phase 1A  
+1. Phase 1A  
 - All four server programs boot up, listening at specific port, showing boot up message.  
  - Run client program, sending function (search or prefix) and input word to the AWS server over TCP.  
 2. Phase 1B  
