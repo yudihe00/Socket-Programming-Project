@@ -16,23 +16,23 @@ based on datagram sockets "server" demo, listener.c in beej
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#define MYPORT "22217"  // the port users will be connecting to, Server B
+#define MYPORT "22217"	// the port users will be connecting to, Server B
 
 #define MAXBUFLEN 4000
 
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
 {
-    if (sa->sa_family == AF_INET) {
-        return &(((struct sockaddr_in*)sa)->sin_addr);
-    }
+	if (sa->sa_family == AF_INET) {
+		return &(((struct sockaddr_in*)sa)->sin_addr);
+	}
 
-    return &(((struct sockaddr_in6*)sa)->sin6_addr);
+	return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
 // parse line
 // return word's last character index
-int parseLine(char line[110]){
+int parseLine(char line[101]){
     int i=0;
     while(!((line[i]==' ') && (line[i+1]==':'))) {
         i++;
@@ -45,7 +45,7 @@ int parseLine(char line[110]){
 // in function return to aws that definition, similar words number and similar words
 char* search(char word[],FILE* file)
 {
-    char line[110];
+    char line[101];
     int wordLength = strlen(word);
     //printf("debug:word length is %d\n",wordLength);
     int findSame=0;
@@ -78,7 +78,7 @@ char* search(char word[],FILE* file)
                 }
             }
             dicWord[lastIndex+1]='\0';
-            // printf("in line debug:same is %d\n",same);
+            //printf("debug:same is %d\n",same);
             if (same==1)  
             {
                 if (findSame!=1) // if find same word, only return the first definition
@@ -109,7 +109,6 @@ char* search(char word[],FILE* file)
             }
         }
         printf("debug:last index is %d\n",lastIndex);
-        printf("debug: befor whilelast line is %s\n",line);
     }
     // printf("debug: similar word number is %d\n", similarWordNumber);
     if (findSame ==1){ //find matching word
@@ -149,7 +148,7 @@ char* search(char word[],FILE* file)
 // in function return to aws that words number and words
 char* prefix(char word[],FILE* file)
 {
-    char line[110];
+    char line[101];
     int wordLength = strlen(word);
     // printf("debug:word length is %d\n",wordLength);
     int findSame=0;
@@ -216,7 +215,7 @@ char* prefix(char word[],FILE* file)
 // in function return to aws that words number and words
 char* suffix(char word[],FILE* file)
 {
-    char line[110];
+    char line[101];
     if(word[0]>='A' && word[0]<='Z') word[0]=word[0]-('A'-'a');
     if(line[0]>='a' && line[0]<='z') line[0]=line[0]+('A'-'a');
 
@@ -289,106 +288,106 @@ char* suffix(char word[],FILE* file)
 
 int main(void)
 {
-    int sockfd;
-    struct addrinfo hints, *servinfo, *p;
-    int rv;
-    int numbytes;
-    struct sockaddr_storage their_addr;
-    char buf[MAXBUFLEN];
-    char function[MAXBUFLEN];
-    char word[MAXBUFLEN];
-    socklen_t addr_len;
-    char s[INET6_ADDRSTRLEN];
-    char send_data[MAXBUFLEN];
+	int sockfd;
+	struct addrinfo hints, *servinfo, *p;
+	int rv;
+	int numbytes;
+	struct sockaddr_storage their_addr;
+	char buf[MAXBUFLEN];
+	char function[MAXBUFLEN];
+	char word[MAXBUFLEN];
+	socklen_t addr_len;
+	char s[INET6_ADDRSTRLEN];
+	char send_data[MAXBUFLEN];
 
-    char *fileName="backendB.txt";
-    char * returnString;
+	char *fileName="backendB.txt";
+	char * returnString;
      
 
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC; // set to AF_INET to force IPv4
-    hints.ai_socktype = SOCK_DGRAM;
-    hints.ai_flags = AI_PASSIVE; // use my IP
+	memset(&hints, 0, sizeof hints);
+	hints.ai_family = AF_UNSPEC; // set to AF_INET to force IPv4
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_flags = AI_PASSIVE; // use my IP
 
-    if ((rv = getaddrinfo(NULL, MYPORT, &hints, &servinfo)) != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
-        return 1;
-    }
+	if ((rv = getaddrinfo(NULL, MYPORT, &hints, &servinfo)) != 0) {
+		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+		return 1;
+	}
 
-    // loop through all the results and bind to the first we can
-    for(p = servinfo; p != NULL; p = p->ai_next) {
-        if ((sockfd = socket(p->ai_family, p->ai_socktype,
-                p->ai_protocol)) == -1) {
-            perror("listener: socket");
-            continue;
-        }
+	// loop through all the results and bind to the first we can
+	for(p = servinfo; p != NULL; p = p->ai_next) {
+		if ((sockfd = socket(p->ai_family, p->ai_socktype,
+				p->ai_protocol)) == -1) {
+			perror("listener: socket");
+			continue;
+		}
 
-        if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
-            close(sockfd);
-            perror("listener: bind");
-            continue;
-        }
+		if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+			close(sockfd);
+			perror("listener: bind");
+			continue;
+		}
 
-        break;
-    }
+		break;
+	}
 
-    if (p == NULL) {
-        fprintf(stderr, "listener: failed to bind socket\n");
-        return 2;
-    }
+	if (p == NULL) {
+		fprintf(stderr, "listener: failed to bind socket\n");
+		return 2;
+	}
 
-    freeaddrinfo(servinfo);
-    addr_len = sizeof their_addr;
+	freeaddrinfo(servinfo);
+	addr_len = sizeof their_addr;
 
-    printf("The Server B is up and running using UDP on port <22217>.\n");
+	printf("The Server B is up and running using UDP on port <22217>.\n");
 
-    while(1) {
-        
-        numbytes = recvfrom(sockfd, function, MAXBUFLEN-1 , 0,
-            (struct sockaddr *)&their_addr, &addr_len);
+	while(1) {
+		
+		numbytes = recvfrom(sockfd, function, MAXBUFLEN-1 , 0,
+			(struct sockaddr *)&their_addr, &addr_len);
 
-        function[numbytes] = '\0';
+		function[numbytes] = '\0';
 
-        numbytes = recvfrom(sockfd, word, MAXBUFLEN-1 , 0,
-            (struct sockaddr *)&their_addr, &addr_len);
+		numbytes = recvfrom(sockfd, word, MAXBUFLEN-1 , 0,
+			(struct sockaddr *)&their_addr, &addr_len);
 
-        word[numbytes] = '\0';
+		word[numbytes] = '\0';
 
-        if (numbytes==-1) {
-            perror("recv");
-            exit(1);
-        }
+		if (numbytes==-1) {
+    		perror("recv");
+	    	exit(1);
+    	}
 
-        //printf("listener: packet is %d bytes long\n", numbytes);
-        printf("The Server B received input <%s> and operation <%s>\n", function,word);
-        
-        FILE* file = fopen(fileName, "r");
-        // change first letter of word to big case
-        if(word[0]>='a' && word[0]<='z') word[0]=word[0]+('A'-'a');
+		//printf("listener: packet is %d bytes long\n", numbytes);
+		printf("The Server B received input <%s> and operation <%s>\n", function,word);
+		
+		FILE* file = fopen(fileName, "r");
+		// change first letter of word to big case
+	    if(word[0]>='a' && word[0]<='z') word[0]=word[0]+('A'-'a');
 
-        if (strcmp(function,"search")==0) returnString=search(word, file);
-        else if (strcmp(function,"prefix")==0) returnString=prefix(word, file);
-        else if (strcmp(function,"suffix")==0) returnString=suffix(word,file);
-        //printf("main: final return string is <%s>\n", returnString);
-        
-        fclose(file);
+	   	if (strcmp(function,"search")==0) returnString=search(word, file);
+	    else if (strcmp(function,"prefix")==0) returnString=prefix(word, file);
+	    else if (strcmp(function,"suffix")==0) returnString=suffix(word,file);
+	    //printf("main: final return string is <%s>\n", returnString);
+	    
+		fclose(file);
 
-        // send back to aws
-        strcpy(send_data,returnString);
-        //printf(" ServerA SEND : %s\n",send_data);
-        
-        numbytes = sendto(sockfd,send_data,strlen(send_data),0,
-            (struct sockaddr *)&their_addr, addr_len);
-        printf("The Server B finished sending the output to AWS\n\n");
-        //printf("debug: numbytes is %d\n", numbytes);
-        free(returnString);
-        returnString=NULL;
-        //printf("main: after free final return string is <%s>\n", returnString);
+		// send back to aws
+		strcpy(send_data,returnString);
+    	//printf(" ServerA SEND : %s\n",send_data);
+    	
+    	numbytes = sendto(sockfd,send_data,strlen(send_data),0,
+    		(struct sockaddr *)&their_addr, addr_len);
+    	printf("The Server B finished sending the output to AWS\n\n");
+    	//printf("debug: numbytes is %d\n", numbytes);
+    	free(returnString);
+	    returnString=NULL;
+	    //printf("main: after free final return string is <%s>\n", returnString);
 
-        fflush(stdout); //wait for next connect
+    	fflush(stdout); //wait for next connect
 
-        //close(sockfd);
-    }
+		//close(sockfd);
+	}
 
-    return 0;
+	return 0;
 }

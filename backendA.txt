@@ -1998,6 +1998,3 @@ Calender :: "To press between rollers for the purpose of making smooth and gloss
 Neaped :: "Left aground on the height of a spring tide  so that it will not float till the next spri
 Ketonic :: "Pertaining to  or derived from  a ketone; as  a ketonic acid."
 Jumble :: To meet or unite in a confused way; to mix confusedly.
-Bumble :: Just test hyd
-Tumble :: test
-Bumcle :: test2

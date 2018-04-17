@@ -32,9 +32,9 @@ void *get_in_addr(struct sockaddr *sa)
 
 // parse line
 // return word's last character index
-int parseLine(char line[101]){
+int parseLine(char line[110]){
     int i=0;
-    while(!(line[i]!=' ' && line[i+1]==':')){
+    while(!((line[i]==' ') && (line[i+1]==':'))){
         i++;
     }
     return i-1;
@@ -44,7 +44,7 @@ int parseLine(char line[101]){
 // in function return to aws that definition, similar words number and similar words
 char* search(char word[],FILE* file)
 {
-    char line[101];
+    char line[110];
     int wordLength = strlen(word);
     //printf("debug:word length is %d\n",wordLength);
     int findSame=0;
@@ -145,7 +145,7 @@ char* search(char word[],FILE* file)
 // in function return to aws that words number and words
 char* prefix(char word[],FILE* file)
 {
-    char line[101];
+    char line[110];
     int wordLength = strlen(word);
     // printf("debug:word length is %d\n",wordLength);
     int findSame=0;
@@ -212,7 +212,7 @@ char* prefix(char word[],FILE* file)
 // in function return to aws that words number and words
 char* suffix(char word[],FILE* file)
 {
-    char line[101];
+    char line[110];
     if(word[0]>='A' && word[0]<='Z') word[0]=word[0]-('A'-'a');
     if(line[0]>='a' && line[0]<='z') line[0]=line[0]+('A'-'a');
 
