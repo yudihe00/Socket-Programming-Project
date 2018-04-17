@@ -64,13 +64,13 @@ int main(int argc, char *argv[])
 	char s[INET6_ADDRSTRLEN];
 
 	if (argc != 3) {
-	    fprintf(stderr,"usage: client function input\n");
+	    fprintf(stderr,"usage: client function input(one word)\n");
 	    exit(1);
 	}
 
 	if(!(strcmp(argv[1],"search")==0 || strcmp(argv[1],"prefix")==0 || strcmp(argv[1],"suffix")==0)) {
 		fprintf(stderr, "function should be search, prefix or suffix\n");
-		return 0;
+		return 1;
 	}
 
 	memset(&hints, 0, sizeof hints);
