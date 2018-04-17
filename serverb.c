@@ -37,7 +37,7 @@ int parseLine(char line[110]){
     while(!((line[i]==' ') && (line[i+1]==':'))) {
         i++;
     }
-    printf("debug in parseLine of line: %s, i=%d\n", line,i);
+    // printf("debug in parseLine of line: %s, i=%d\n", line,i);
     return i-1;
 }
 
@@ -60,9 +60,9 @@ char* search(char word[],FILE* file)
         /* note that fgets don't strip the terminating \n, checking its
            presence would allow to handle lines longer that sizeof(line) */
         //printf("%s", line); 
-        printf("debug:in while line is %s\n",line);
+        // printf("debug:in while line is %s\n",line);
         int lastIndex=parseLine(line);
-        printf("debug:last index is %d\n",lastIndex);
+        // printf("debug:last index is %d\n",lastIndex);
 
         if (lastIndex+1==wordLength) //have same length
         {
@@ -108,8 +108,8 @@ char* search(char word[],FILE* file)
                 similarWordNumber++;
             }
         }
-        printf("debug:last index is %d\n",lastIndex);
-        printf("debug: befor whilelast line is %s\n",line);
+        // printf("debug:last index is %d\n",lastIndex);
+        // printf("debug: befor whilelast line is %s\n",line);
     }
     // printf("debug: similar word number is %d\n", similarWordNumber);
     if (findSame ==1){ //find matching word
