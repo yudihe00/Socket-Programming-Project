@@ -26,6 +26,7 @@ Receive function and word from aws over UDP, do the function relative searching 
 Receive function and word from aws over UDP, do the function relative searching in backendB database, send back result to aws.  
 ***serverc.c***  
 Receive function and word from aws over UDP, do the function relative searching in backendC database, send back result to aws.  
+
 ### Messages exchange format example  
 1. Execute search hack  
 - aws console  
@@ -155,7 +156,9 @@ The Server C is up and running using UDP on port <23217>.
 The Server C received input <suffix> and operation <ntable>  
 The Server C has found < 2 > matches  
 The Server C finished sending the output to AWS  
+
 ### Idiosyncrasy of my project.  
 I set maximum size of the TCP and UTP buffer as 4000, if the searching result of prefix and suffix is very long, such as the input word only has one character the memory will crash.  
+
 ### Reused Code  
 My TCP and UDP setting up code is based on examples in Beej's book.  

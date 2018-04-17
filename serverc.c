@@ -34,7 +34,7 @@ void *get_in_addr(struct sockaddr *sa)
 // return word's last character index
 int parseLine(char line[101]){
     int i=0;
-    while(line[i]!=' '){
+    while(!(line[i]!=' ' && line[i+1]==':')){
         i++;
     }
     return i-1;
