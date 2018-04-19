@@ -359,6 +359,10 @@ int main(void)
 		printf("The Server A received input <%s> and operation <%s>\n", function,word);
 		
 		FILE* file = fopen(fileName, "r");
+        if (file == NULL) {
+            printf("Error: Databse %s not exist.\n",fileName);
+            return 1;
+        }
 		// change first letter of word to big case
 	    if(word[0]>='a' && word[0]<='z') word[0]=word[0]+('A'-'a');
 
