@@ -4,10 +4,11 @@
 # Use <make> to compile
 ####### How to run:
 # Open six terminal, run each program in the following order on different terminal
-# 1. run aws use <make aws>
-# 2. run monitor, three servers in any order use <make monitor>,<make server#>
-# 3. run client use <./client [function (choose one from search, suffix or prefix)] word>
-# 4. client.c will terminate by itself, other programs need to use <crtl+c> to terminate.
+# 1. run three servers in any order use <make server#>
+# 2. run aws use <make aws>
+# 3. run monitor <make monitor>
+# 4. run client use <./client [function (choose one from search, suffix or prefix)] word>
+# 5. client.c will terminate by itself, other programs need to use <crtl+c> to terminate.
 #######
 
 all: 

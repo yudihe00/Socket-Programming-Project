@@ -30,11 +30,12 @@
 	Receive function and word from aws over UDP, do the function relative searching in backendC database, send back result to aws.  
 
 ### How to run
-	1. Put all files and three database txt in one directory. Open six terminal in the directory, run each program in the following order on different terminal
-	2. Run aws use <make aws>
-	3. Run monitor, three servers in any order use <make monitor>,<make server#>
-	4. Run client use <./client [function (choose one from search, suffix or prefix)] word>
-	5. The client.c will terminate by itself, other programs need to use <crtl+c> to terminate.
+	1. Put all files and three database txt files in one directory. Open six terminal in the directory, run each program in the following order on different terminals
+	2. run three servers in any order use <make server#>
+	3. run aws use <make aws>
+	4. run monitor use <make monitor>
+	5. Run client use <./client [function (choose one from search, suffix or prefix)] word>
+	6. The client.c will terminate by itself, other programs need to use <crtl+c> to terminate.
 
 ### Messages exchange format example  
 	1. Execute search hack  
