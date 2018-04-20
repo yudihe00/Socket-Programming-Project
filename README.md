@@ -1,7 +1,4 @@
-# ee450-project-18spring  
-	Name: Yudi He    
-	ID: 5670857217    
-
+# ee450-project-18spring     
 ### What I have done  
 	I have completed all parts of requirement including extra points part.     
 	1. Phase 1A  
